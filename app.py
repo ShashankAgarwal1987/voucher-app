@@ -78,29 +78,42 @@ def index():
     if request.method == "POST":
         start_date = request.form["start_date"]
         itinerary_text = request.form["itinerary"]
+        output_format = request.form["output_format"]
 
         # Transform itinerary
         df = transform_itinerary_semantic(start_date, itinerary_text)
 
-        # Generate PDF
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
+        if output_format == "pdf":
+            # Generate PDF
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
 
-        for _, row in df.iterrows():
-            pdf.multi_cell(0, 10, f"Date: {row['Date']}", align="L")
-            pdf.multi_cell(0, 10, f"{row['Formatted Output']}\n", align="L")
+            for _, row in df.iterrows():
+                pdf.multi_cell(0, 10, f"Date: {row['Date']}", align="L")
+                pdf.multi_cell(0, 10, f"{row['Formatted Output']}\n", align="L")
 
-        pdf_bytes = io.BytesIO()
-        pdf.output(pdf_bytes, "F")
-        pdf_bytes.seek(0)
+            pdf_bytes = io.BytesIO()
+            pdf.output(pdf_bytes, "F")
+            pdf_bytes.seek(0)
 
-        return send_file(
-            pdf_bytes, download_name="Service_Voucher.pdf", as_attachment=True
-        )
+            return send_file(
+                pdf_bytes, download_name="Service_Voucher.pdf", as_attachment=True
+            )
+
+        elif output_format == "excel":
+            # Generate Excel
+            excel_bytes = io.BytesIO()
+            df.to_excel(excel_bytes, index=False)
+            excel_bytes.seek(0)
+
+            return send_file(
+                excel_bytes, download_name="Service_Voucher.xlsx", as_attachment=True
+            )
 
     return render_template("index.html")
 
 
+# Safe for both local & Render
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
