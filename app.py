@@ -40,6 +40,3 @@ def index():
             return send_file(pdf_bytes, as_attachment=True, download_name="voucher.pdf")
 
     return render_template("index.html")
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
