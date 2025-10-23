@@ -5,38 +5,48 @@ import io
 
 app = Flask(__name__)
 
-df = None  # Global Excel data
-
+# Home page
 @app.route("/", methods=["GET", "POST"])
 def index():
-    global df
     if request.method == "POST":
-        if "excel" in request.files:  # Upload Excel
-            excel_file = request.files["excel"]
-            df = pd.read_excel(excel_file)
-            return render_template("index.html", message="Excel uploaded successfully!")
+        # Read uploaded Excel file
+        excel_file = request.files["excel_file"]
+        df = pd.read_excel(excel_file)
 
-        if "query" in request.form:  # Generate Voucher
-            query = request.form["query"].lower()
-            if df is None:
-                return render_template("index.html", error="Upload Excel first!")
+        # Get tour/transfer name
+        tour_name = request.form["tour_name"]
 
-            match = df[df["Particular"].str.lower().str.contains(query, na=False)]
-            if match.empty:
-                return render_template("index.html", error="No matching tour found!")
+        # Try to find matching row in Excel
+        match = df[df["Particular"].str.contains(tour_name, case=False, na=False)]
 
-            output_text = match.iloc[0]["Formatted Output"]
+        if match.empty:
+            return "❌ Tour not found in the uploaded Excel file."
 
-            # Generate PDF in memory
-            pdf = FPDF()
-            pdf.add_page()
-            pdf.set_font("Arial", size=12)
-            pdf.multi_cell(0, 10, f"Service Voucher\n\n{output_text}")
+        # Extract details
+        city = match.iloc[0]["City / Tour / Transfer"]
+        particular = match.iloc[0]["Particular"]
+        description = match.iloc[0]["Tour Description"]
 
-            pdf_bytes = io.BytesIO()
-            pdf.output(pdf_bytes)
-            pdf_bytes.seek(0)
+        # --- Generate PDF voucher ---
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
 
-            return send_file(pdf_bytes, as_attachment=True, download_name="voucher.pdf")
+        pdf.cell(200, 10, txt="Travel LYKKE - Service Voucher", ln=True, align="C")
+        pdf.ln(10)
+        pdf.cell(200, 10, txt=f"City/Tour/Transfer: {city}", ln=True)
+        pdf.cell(200, 10, txt=f"Particular: {particular}", ln=True)
+        pdf.multi_cell(0, 10, txt=f"Description: {description}")
 
+        # Output PDF as bytes
+        pdf_bytes = pdf.output(dest="S").encode("latin1")
+
+        return send_file(
+            io.BytesIO(pdf_bytes),
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name="voucher.pdf"
+        )
+
+    # GET request → show upload form
     return render_template("index.html")
