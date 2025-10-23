@@ -3,3 +3,5 @@ gunicorn
 pandas
 openpyxl
 fpdf
+sentence-transformers
+torch
