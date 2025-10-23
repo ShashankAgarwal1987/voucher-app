@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Travel Voucher Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1, h2 {
+      color: #004080;
+    }
+    form {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input[type="file"], input[type="text"], button {
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    button {
+      background-color: #004080;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0066cc;
+    }
+    .message {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Travel Voucher Generator</h1>
+
+  <h2>Step 1: Upload Excel with Rules</h2>
+  <form method="post" enctype="multipart/form-data">
+    <input type="file" name="excel" required>
+    <button type="submit">Upload Excel</button>
+  </form>
+
+  <h2>Step 2: Generate Voucher</h2>
+  <form method="post">
+    <input type="text" name="query" placeholder="Enter tour/transfer name" required size="40">
+    <button type="submit">Generate Voucher</button>
+  </form>
+
+  {% if message %}
+    <p class="message">{{ message }}</p>
+  {% endif %}
+  {% if error %}
+    <p class="error">{{ error }}</p>
+  {% endif %}
+</body>
+</html>
