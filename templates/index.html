@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Travel LYKKE - Voucher Generator</title>
+    <title>Service Voucher Generator</title>
 </head>
 <body>
-    <h2>Upload Itinerary Excel & Generate Voucher</h2>
+    <h2>Generate Service Voucher</h2>
+    <form method="POST">
+        <label>Start Date (DD-MMM-YYYY):</label><br>
+        <input type="text" name="start_date" placeholder="30-Jul-2025" required><br><br>
+        
+        <label>Itinerary (Day-wise):</label><br>
+        <textarea name="itinerary" rows="10" cols="50" required></textarea><br><br>
 
-    <form method="POST" enctype="multipart/form-data">
-        <label for="excel_file">Upload Excel File:</label>
-        <input type="file" name="excel_file" required><br><br>
-
-        <label for="tour_name">Enter Tour/Transfer Name:</label>
-        <input type="text" name="tour_name" placeholder="e.g. Pyramids Day Tour" required><br><br>
-
+        <label>Output Format:</label><br>
+        <select name="output_format" required>
+            <option value="pdf">PDF</option>
+            <option value="excel">Excel</option>
+        </select><br><br>
+        
         <button type="submit">Generate Voucher</button>
     </form>
 </body>
